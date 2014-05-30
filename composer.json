@@ -13,7 +13,6 @@
         "php": ">=5.4.0",
         "illuminate/support": "4.1.*",
         "illuminate/database": "4.1.*",
-        "illuminate/events": "4.1.*",
         "cagartner/sql-anywhere-client": "dev-master"
     },
     "require-dev": {
@@ -22,8 +21,7 @@
     },
     "autoload": {
         "psr-0": {
-            "Cagartner\\SQLAnywhere": "src/",
-            "Cagartner\\Eloquent": "src/"
+            "Cagartner\\SQLAnywhere": "src/"
         }
     }
 }

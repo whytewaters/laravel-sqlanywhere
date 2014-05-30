@@ -1,36 +1,56 @@
-<?php 
+<?php namespace Cagartner\SQLAnywhere;
 
-namespace Cagartner\SQLAnywhere;
-
-use Cagartner\SQLAnywhere\Model;
-use Cagartner\SQLAnywhere\DatabaseManager;
 use Illuminate\Support\ServiceProvider;
+
 
 class SQLAnywhereServiceProvider extends ServiceProvider {
 
-    /**
-     * Bootstrap the application events.
-     *
-     * @return void
-     */
-    public function boot()
-    {
-        Model::setConnectionResolver($this->app['db']);
-        Model::setEventDispatcher($this->app['events']);
-    }
+	/**
+	 * Indicates if loading of the provider is deferred.
+	 *
+	 * @var bool
+	 */
+	protected $defer = false;
 
-    /**
-     * Register the service provider.
-     *
-     * @return void
-     */
-    public function register()
-    {
-        // Add a SQLAnywhere extension to the original database manager
-        $this->app['db']->extend('sqlanywhere', function($config)
-        {
-            return new Connection($config);
-        });
-    }
+	/**
+	 * Bootstrap the application events.
+	 *
+	 * @return void
+	 */
+	public function boot()
+	{
+        $factory = $this->app['db'];
+        $factory->extend('sqlanywhere',function($config) {
+			if ( ! isset($config['prefix']))
+			{
+				$config['prefix'] = '';
+			}
+
+            $connector =  new SQLAnywhereConnector();
+			$pdo = $connector->connect($config);
+            return new SQLAnywhereConnection($pdo, $config['database'], $config['prefix']);
+
+		});
+	}
+
+	/**
+	 * Register the service provider.
+	 *
+	 * @return void
+	 */
+	public function register()
+	{
+		//
+	}
+
+	/**
+	 * Get the services provided by the provider.
+	 *
+	 * @return array
+	 */
+	public function provides()
+	{
+		return array();
+	}
 
 }
