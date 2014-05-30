@@ -1,6 +1,8 @@
-<?php namespace Jenssegers\Mongodb\Auth;
+<?php 
 
-use Jenssegers\Mongodb\Auth\DatabaseReminderRepository as DbRepository;
+namespace Cagartner\SQLAnywhere\Auth;
+
+use Cagartner\SQLAnywhere\Auth\DatabaseReminderRepository as DbRepository;
 
 class ReminderServiceProvider extends \Illuminate\Auth\Reminders\ReminderServiceProvider {
 

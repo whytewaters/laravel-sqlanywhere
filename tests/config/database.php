@@ -4,11 +4,13 @@ return array(
 
 	'connections' => array(
 
-		'mongodb' => array(
-			'name'	   => 'mongodb',
-			'driver'   => 'mongodb',
-			'host'     => 'localhost',
-			'database' => 'unittest',
+		'sqlanywhere' => array(
+			'host'        => '{host=localhost;port=9505}',
+			'username'    => 'CDTESTE',
+			'password'    => '123sql',
+			'database'    => 'CDTESTE',
+			'auto_commit' => true,
+			'persintent'  => false,
 		),
 
 		'mysql' => array(

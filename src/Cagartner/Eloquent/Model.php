@@ -1,14 +1,16 @@
-<?php namespace Jenssegers\Eloquent;
+<?php 
+
+namespace Cagartner\Eloquent;
 
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\Relation;
-use Jenssegers\Mongodb\Relations\HasOne;
-use Jenssegers\Mongodb\Relations\HasMany;
-use Jenssegers\Mongodb\Relations\BelongsTo;
-use Jenssegers\Mongodb\Relations\BelongsToMany;
-use Jenssegers\Mongodb\Relations\MorphTo;
-use Jenssegers\Mongodb\Query\Builder as QueryBuilder;
+use Cagartner\SQLAnywhere\Relations\HasOne;
+use Cagartner\SQLAnywhere\Relations\HasMany;
+use Cagartner\SQLAnywhere\Relations\BelongsTo;
+use Cagartner\SQLAnywhere\Relations\BelongsToMany;
+use Cagartner\SQLAnywhere\Relations\MorphTo;
+use Cagartner\SQLAnywhere\Query\Builder as QueryBuilder;
 
 abstract class Model extends \Illuminate\Database\Eloquent\Model {
 
@@ -23,7 +25,7 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model {
     public function hasOne($related, $foreignKey = null, $localKey = null)
     {
         // Check if it is a relation with an original model.
-        if (!is_subclass_of($related, 'Jenssegers\Mongodb\Model'))
+        if (!is_subclass_of($related, 'Cagartner\SQLAnywhere\Model'))
         {
             return parent::hasOne($related, $foreignKey, $localKey);
         }
@@ -50,7 +52,7 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model {
     public function morphOne($related, $name, $type = null, $id = null, $localKey = null)
     {
         // Check if it is a relation with an original model.
-        if (!is_subclass_of($related, 'Jenssegers\Mongodb\Model'))
+        if (!is_subclass_of($related, 'Cagartner\SQLAnywhere\Model'))
         {
             return parent::morphOne($related, $name, $type, $id, $localKey );
         }
@@ -77,7 +79,7 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model {
     public function hasMany($related, $foreignKey = null, $localKey = null)
     {
         // Check if it is a relation with an original model.
-        if (!is_subclass_of($related, 'Jenssegers\Mongodb\Model'))
+        if (!is_subclass_of($related, 'Cagartner\SQLAnywhere\Model'))
         {
             return parent::hasMany($related, $foreignKey, $localKey);
         }
@@ -104,7 +106,7 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model {
     public function morphMany($related, $name, $type = null, $id = null, $localKey = null)
     {
         // Check if it is a relation with an original model.
-        if (!is_subclass_of($related, 'Jenssegers\Mongodb\Model'))
+        if (!is_subclass_of($related, 'Cagartner\SQLAnywhere\Model'))
         {
             return parent::morphMany($related, $name, $type, $id, $localKey);
         }
@@ -145,7 +147,7 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model {
         }
 		
         // Check if it is a relation with an original model.
-        if (!is_subclass_of($related, 'Jenssegers\Mongodb\Model'))
+        if (!is_subclass_of($related, 'Cagartner\SQLAnywhere\Model'))
         {
             return parent::belongsTo($related, $foreignKey, $otherKey, $relation);
         }
@@ -236,7 +238,7 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model {
         }
 		
         // Check if it is a relation with an original model.
-        if (!is_subclass_of($related, 'Jenssegers\Mongodb\Model'))
+        if (!is_subclass_of($related, 'Cagartner\SQLAnywhere\Model'))
         {
             return parent::belongsToMany($related, $collection, $foreignKey, $otherKey, $relation);
         }
@@ -276,7 +278,7 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model {
         $connection = $this->getConnection();
 
         // Check the connection type
-        if ($connection instanceof \Jenssegers\Mongodb\Connection)
+        if ($connection instanceof \Cagartner\SQLAnywhere\Connection)
         {
             return new QueryBuilder($connection);
         }

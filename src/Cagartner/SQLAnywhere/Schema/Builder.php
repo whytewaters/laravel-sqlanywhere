@@ -1,8 +1,8 @@
-<?php namespace Jenssegers\Mongodb\Schema;
+<?php namespace Cagartner\SQLAnywhere\Schema;
 
 use Closure;
-use Jenssegers\Mongodb\Connection;
-use Jenssegers\Mongodb\Schema\Blueprint;
+use Cagartner\SQLAnywhere\Connection;
+use Cagartner\SQLAnywhere\Schema\Blueprint;
 
 class Builder extends \Illuminate\Database\Schema\Builder {
 
@@ -24,7 +24,7 @@ class Builder extends \Illuminate\Database\Schema\Builder {
 	 */
 	public function hasCollection($collection)
 	{
-		$db = $this->connection->getMongoDB();
+		$db = $this->connection->getSQLAnywhere();
 
 		return in_array($collection, $db->getCollectionNames());
 	}

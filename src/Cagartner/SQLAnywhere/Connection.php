@@ -1,19 +1,21 @@
-<?php namespace Jenssegers\Mongodb;
+<?php 
 
-use Jenssegers\Mongodb\Query\Builder as QueryBuilder;
-use MongoClient;
+namespace Cagartner\SQLAnywhere;
+
+use Cagartner\SQLAnywhere\Query\Builder as QueryBuilder;
+use \Cagartner\SQLAnywhereClient\SQLAnywhereClient;
 
 class Connection extends \Illuminate\Database\Connection {
 
     /**
-     * The MongoDB database handler.
+     * The SQLAnywhere database handler.
      *
      * @var resource
      */
     protected $db;
 
     /**
-     * The MongoClient connection handler.
+     * The SQLAnywhereClient connection handler.
      *
      * @var resource
      */
@@ -32,14 +34,11 @@ class Connection extends \Illuminate\Database\Connection {
         // Build the connection string
         $dsn = $this->getDsn($config);
 
-        // You can pass options directly to the MogoClient constructor
-        $options = array_get($config, 'options', array());
-
         // Create the connection
-        $this->connection = $this->createConnection($dsn, $config, $options);
+        $this->connection = $this->createConnection($dsn, $config);
 
         // Select database
-        $this->db = $this->connection->{$config['database']};
+        $this->db = $config['database'];
     }
 
     /**
@@ -67,10 +66,10 @@ class Connection extends \Illuminate\Database\Connection {
     }
 
     /**
-     * Get a MongoDB collection.
+     * Get a SQLAnywhere collection.
      *
      * @param  string   $name
-     * @return MongoDB
+     * @return SQLAnywhere
      */
     public function getCollection($name)
     {
@@ -88,48 +87,51 @@ class Connection extends \Illuminate\Database\Connection {
     }
 
     /**
-     * Get the MongoDB database object.
+     * Get the SQLAnywhere database object.
      *
-     * @return  MongoDB
+     * @return  SQLAnywhere
      */
-    public function getMongoDB()
+    public function getSQLAnywhere()
     {
         return $this->db;
     }
 
     /**
-     * return MongoClient object
+     * return SQLAnywhereClient object
      *
-     * @return MongoClient
+     * @return SQLAnywhereClient
      */
-    public function getMongoClient()
+    public function getSQLAnywhereClient()
     {
         return $this->connection;
     }
 
     /**
-     * Create a new MongoClient connection.
+     * Create a new SQLAnywhereClient connection.
      *
      * @param  string  $dsn
      * @param  array   $config
      * @param  array   $options
-     * @return MongoClient
+     * @return SQLAnywhereClient
      */
-    protected function createConnection($dsn, array $config, array $options)
+    protected function createConnection($dsn, array $config)
     {
+        $auto_commit = true;
+        $persistent  = false;
+
         // Add credentials as options, this makes sure the connection will not fail if
         // the username or password contains strange characters.
-        if (isset($config['username']) && $config['username'])
+        if (isset($config['auto_commit']) && $config['auto_commit'])
         {
-            $options['username'] = $config['username'];
+            $auto_commit = $config['auto_commit'];
         }
 
-        if (isset($config['password']) && $config['password'])
+        if (isset($config['persistent']) && $config['persistent'])
         {
-            $options['password'] = $config['password'];
+            $persistent = $config['persistent'];
         }
 
-        return new MongoClient($dsn, $options);
+        return new SQLAnywhereClient($dsn, $auto_commit, $persistent);
     }
 
     /**
@@ -142,24 +144,12 @@ class Connection extends \Illuminate\Database\Connection {
     {
         // First we will create the basic DSN setup as well as the port if it is in
         // in the configuration options. This will give us the basic DSN we will
-        // need to establish the MongoClient and return them back for use.
+        // need to establish the SQLAnywhereClient and return them back for use.
         extract($config);
-
-        // Treat host option as array of hosts
-        $hosts = is_array($config['host']) ? $config['host'] : array($config['host']);
-
-        // Add ports to hosts
-        foreach ($hosts as &$host)
-        {
-            if (isset($config['port']))
-            {
-                $host = "{$host}:{$port}";
-            }
-        }
 
         // The database name needs to be in the connection string, otherwise it will
         // authenticate to the admin database, which may result in permission errors.
-        return "mongodb://" . implode(',', $hosts) . "/{$database}";
+        return "uid={$username};pwd={$password};ENG={$database};commlinks={$config['host']}";
     }
 
     /**
@@ -180,7 +170,7 @@ class Connection extends \Illuminate\Database\Connection {
     */
     public function getDriverName()
     {
-        return 'mongodb';
+        return 'SQLAnywhereClient';
     }
 
     /**

@@ -1,18 +1,20 @@
-<?php namespace Jenssegers\Mongodb;
+<?php 
+
+namespace Cagartner\SQLAnywhere;
 
 use Illuminate\Database\Eloquent\Collection;
-use Jenssegers\Mongodb\DatabaseManager as Resolver;
-use Jenssegers\Mongodb\Eloquent\Builder;
-use Jenssegers\Mongodb\Query\Builder as QueryBuilder;
-use Jenssegers\Mongodb\Relations\EmbedsMany;
-use Jenssegers\Mongodb\Relations\EmbedsOne;
+use Cagartner\SQLAnywhere\DatabaseManager as Resolver;
+use Cagartner\SQLAnywhere\Eloquent\Builder;
+use Cagartner\SQLAnywhere\Query\Builder as QueryBuilder;
+use Cagartner\SQLAnywhere\Relations\EmbedsMany;
+use Cagartner\SQLAnywhere\Relations\EmbedsOne;
 
 use Carbon\Carbon;
 use DateTime;
-use MongoId;
-use MongoDate;
+use SQLAnywhereId;
+use SQLAnywhereDate;
 
-abstract class Model extends \Jenssegers\Eloquent\Model {
+abstract class Model extends \Cagartner\Eloquent\Model {
 
     /**
      * The collection associated with the model.
@@ -122,15 +124,15 @@ abstract class Model extends \Jenssegers\Eloquent\Model {
     }
 
     /**
-     * Convert a DateTime to a storable MongoDate object.
+     * Convert a DateTime to a storable SQLAnywhereDate object.
      *
      * @param  DateTime|int  $value
-     * @return MongoDate
+     * @return SQLAnywhereDate
      */
     public function fromDateTime($value)
     {
-        // If the value is already a MongoDate instance, we don't need to parse it.
-        if ($value instanceof MongoDate)
+        // If the value is already a SQLAnywhereDate instance, we don't need to parse it.
+        if ($value instanceof SQLAnywhereDate)
         {
             return $value;
         }
@@ -141,7 +143,7 @@ abstract class Model extends \Jenssegers\Eloquent\Model {
             $value = parent::asDateTime($value);
         }
 
-        return new MongoDate($value->getTimestamp());
+        return new SQLAnywhereDate($value->getTimestamp());
     }
 
     /**
@@ -152,8 +154,8 @@ abstract class Model extends \Jenssegers\Eloquent\Model {
      */
     protected function asDateTime($value)
     {
-        // Convert MongoDate instances.
-        if ($value instanceof MongoDate)
+        // Convert SQLAnywhereDate instances.
+        if ($value instanceof SQLAnywhereDate)
         {
             return Carbon::createFromTimestamp($value->sec);
         }
@@ -174,11 +176,11 @@ abstract class Model extends \Jenssegers\Eloquent\Model {
     /**
      * Get a fresh timestamp for the model.
      *
-     * @return MongoDate
+     * @return SQLAnywhereDate
      */
     public function freshTimestamp()
     {
-        return new MongoDate;
+        return new SQLAnywhereDate;
     }
 
     /**
@@ -213,9 +215,9 @@ abstract class Model extends \Jenssegers\Eloquent\Model {
     {
         $attribute = parent::getAttribute($key);
 
-        // If the attribute is a MongoId object, return it as a string.
+        // If the attribute is a SQLAnywhereId object, return it as a string.
         // This is makes Eloquent relations a lot easier.
-        if ($attribute instanceof MongoId)
+        if ($attribute instanceof SQLAnywhereId)
         {
             return (string) $attribute;
         }
@@ -233,17 +235,17 @@ abstract class Model extends \Jenssegers\Eloquent\Model {
         $attributes = parent::attributesToArray();
 
         // Because the original Eloquent never returns objects, we convert
-        // MongoDB related objects to a string representation. This kind
+        // SQLAnywhere related objects to a string representation. This kind
         // of mimics the SQL behaviour so that dates are formatted
         // nicely when your models are converted to JSON.
         foreach ($attributes as &$value)
         {
-            if ($value instanceof MongoId)
+            if ($value instanceof SQLAnywhereId)
             {
                 $value = (string) $value;
             }
 
-            else if ($value instanceof MongoDate)
+            else if ($value instanceof SQLAnywhereDate)
             {
                 $value = $this->asDateTime($value)->format($this->getDateFormat());
             }
@@ -304,8 +306,8 @@ abstract class Model extends \Jenssegers\Eloquent\Model {
     /**
      * Create a new Eloquent query builder for the model.
      *
-     * @param  \Jenssegers\Mongodb\Query\Builder $query
-     * @return \Jenssegers\Mongodb\Eloquent\Builder|static
+     * @param  \Cagartner\SQLAnywhere\Query\Builder $query
+     * @return \Cagartner\SQLAnywhere\Eloquent\Builder|static
      */
     public function newEloquentBuilder($query)
     {

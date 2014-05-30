@@ -1,9 +1,8 @@
-<?php namespace Jenssegers\Mongodb\Relations;
+<?php 
 
-use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Relations\MorphTo as EloquentMorphTo;
+namespace Cagartner\Mongodb\Relations;
 
-class MorphTo extends EloquentMorphTo {
+class BelongsTo extends \Illuminate\Database\Eloquent\Relations\BelongsTo {
 
 	/**
 	* Set the base constraints on the relation query.
@@ -29,7 +28,12 @@ class MorphTo extends EloquentMorphTo {
 	 */
 	public function addEagerConstraints(array $models)
 	{
-		$this->buildDictionary($this->models = Collection::make($models));
+		// We'll grab the primary key name of the related models since it could be set to
+		// a non-standard name and not "id". We will then construct the constraint for
+		// our eagerly loading query so it returns the proper models from execution.
+		$key = $this->otherKey;
+
+		$this->query->whereIn($key, $this->getEagerModelKeys($models));
 	}
 
 }

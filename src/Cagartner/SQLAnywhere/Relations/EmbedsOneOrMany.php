@@ -1,4 +1,5 @@
-<?php namespace Jenssegers\Mongodb\Relations;
+<?php 
+namespace Cagartner\SQLAnywhere\Relations;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;

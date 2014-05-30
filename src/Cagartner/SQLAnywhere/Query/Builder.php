@@ -1,20 +1,21 @@
-<?php namespace Jenssegers\Mongodb\Query;
+<?php 
+namespace Cagartner\SQLAnywhere\Query;
 
-use MongoID;
-use MongoRegex;
-use MongoDate;
+use SQLAnywhereID;
+use SQLAnywhereRegex;
+use SQLAnywhereDate;
 use DateTime;
 use Closure;
 
 use Illuminate\Database\Query\Expression;
-use Jenssegers\Mongodb\Connection;
+use Cagartner\SQLAnywhere\Connection;
 
 class Builder extends \Illuminate\Database\Query\Builder {
 
     /**
      * The database collection
      *
-     * @var MongoCollection
+     * @var SQLAnywhereCollection
      */
     protected $collection;
 
@@ -65,7 +66,7 @@ class Builder extends \Illuminate\Database\Query\Builder {
      */
     public function find($id, $columns = array())
     {
-        return $this->where('_id', '=', $this->convertKey($id))->first($columns);
+        return $this->where('id', '=', $this->convertKey($id))->first($columns);
     }
 
     /**
@@ -83,13 +84,13 @@ class Builder extends \Illuminate\Database\Query\Builder {
         // all of the columns on the table using the "wildcard" column character.
         if (is_null($this->columns)) $this->columns = $columns;
 
-        // Drop all columns if * is present, MongoDB does not work this way.
+        // Drop all columns if * is present, SQLAnywhere does not work this way.
         if (in_array('*', $this->columns)) $this->columns = array();
 
         // Compile wheres
         $wheres = $this->compileWheres();
 
-        // Use MongoDB's aggregation framework when using grouping or aggregation functions.
+        // Use SQLAnywhere's aggregation framework when using grouping or aggregation functions.
         if ($this->groups || $this->aggregate)
         {
             $group = array();
@@ -99,7 +100,7 @@ class Builder extends \Illuminate\Database\Query\Builder {
             {
                 foreach ($this->groups as $column)
                 {
-                    $group['_id'][$column] = '$' . $column;
+                    $group['id'][$column] = '$' . $column;
 
                     // When grouping, also add the $last operator to each grouped field,
                     // this mimics MySQL's behaviour a bit.
@@ -108,9 +109,9 @@ class Builder extends \Illuminate\Database\Query\Builder {
             }
             else
             {
-                // If we don't use grouping, set the _id to null to prepare the pipeline for
+                // If we don't use grouping, set the id to null to prepare the pipeline for
                 // other aggregation functions.
-                $group['_id'] = null;
+                $group['id'] = null;
             }
 
             // Add aggregation functions to the $group part of the aggregation pipeline,
@@ -171,7 +172,7 @@ class Builder extends \Illuminate\Database\Query\Builder {
         else if ($this->distinct)
         {
             // Return distinct results directly
-            $column = isset($this->columns[0]) ? $this->columns[0] : '_id';
+            $column = isset($this->columns[0]) ? $this->columns[0] : 'id';
 
             // Execute distinct
             $result = $this->collection->distinct($column, $wheres);
@@ -193,7 +194,7 @@ class Builder extends \Illuminate\Database\Query\Builder {
                 $columns[$column] = true;
             }
 
-            // Execute query and get MongoCursor
+            // Execute query and get SQLAnywhereCursor
             $cursor = $this->collection->find($wheres, $columns);
 
             // Apply order, offset and limit
@@ -374,7 +375,7 @@ class Builder extends \Illuminate\Database\Query\Builder {
         {
             if (!$sequence)
             {
-                $sequence = '_id';
+                $sequence = 'id';
             }
 
             // Return id
@@ -446,11 +447,11 @@ class Builder extends \Illuminate\Database\Query\Builder {
     {
         $result = (array) $this->first(array($column));
 
-        // MongoDB returns the _id field even if you did not ask for it, so we need to
+        // SQLAnywhere returns the id field even if you did not ask for it, so we need to
         // remove this from the result.
-        if (array_key_exists('_id', $result))
+        if (array_key_exists('id', $result))
         {
-            unset($result['_id']);
+            unset($result['id']);
         }
 
         return count($result) > 0 ? reset($result) : null;
@@ -518,7 +519,7 @@ class Builder extends \Illuminate\Database\Query\Builder {
      */
     public function raw($expression = null)
     {
-        // Execute the closure on the mongodb collection
+        // Execute the closure on the SQLAnywhere collection
         if ($expression instanceof Closure)
         {
             return call_user_func($expression, $this->collection);
@@ -530,7 +531,7 @@ class Builder extends \Illuminate\Database\Query\Builder {
             return new Expression($expression);
         }
 
-        // Quick access to the mongodb collection
+        // Quick access to the SQLAnywhere collection
         return $this->collection;
     }
 
@@ -645,7 +646,7 @@ class Builder extends \Illuminate\Database\Query\Builder {
     }
 
     /**
-     * Convert a key to MongoID if needed.
+     * Convert a key to SQLAnywhereID if needed.
      *
      * @param  mixed $id
      * @return mixed
@@ -654,7 +655,7 @@ class Builder extends \Illuminate\Database\Query\Builder {
     {
         if (is_string($id) && strlen($id) === 24 && ctype_xdigit($id))
         {
-            return new MongoId($id);
+            return new SQLAnywhereId($id);
         }
 
         return $id;
@@ -687,7 +688,7 @@ class Builder extends \Illuminate\Database\Query\Builder {
             }
 
             // Convert id's
-            if (isset($where['column']) && $where['column'] == '_id')
+            if (isset($where['column']) && $where['column'] == 'id')
             {
                 // Multiple values
                 if (isset($where['values']))
@@ -707,7 +708,7 @@ class Builder extends \Illuminate\Database\Query\Builder {
             // Convert dates
             if (isset($where['value']) && $where['value'] instanceof DateTime)
             {
-                $where['value'] = new MongoDate($where['value']->getTimestamp());
+                $where['value'] = new SQLAnywhereDate($where['value']->getTimestamp());
             }
 
             // First item of chain
@@ -738,7 +739,7 @@ class Builder extends \Illuminate\Database\Query\Builder {
     {
         extract($where);
 
-        // Replace like with MongoRegex
+        // Replace like with SQLAnywhereRegex
         if ($operator == 'like')
         {
             $operator = '=';
@@ -748,7 +749,7 @@ class Builder extends \Illuminate\Database\Query\Builder {
             if (substr($value, 0, 1) != '%') $regex = '^' . $regex;
             if (substr($value, -1) != '%')   $regex = $regex . '$';
 
-            $value = new MongoRegex("/$regex/i");
+            $value = new SQLAnywhereRegex("/$regex/i");
         }
 
         if (!isset($operator) || $operator == '=')

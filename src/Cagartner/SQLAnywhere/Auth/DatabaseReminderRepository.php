@@ -1,4 +1,6 @@
-<?php namespace Jenssegers\Mongodb\Auth;
+<?php 
+
+namespace Cagartner\SQLAnywhere\Auth;
 
 class DatabaseReminderRepository extends \Illuminate\Auth\Reminders\DatabaseReminderRepository {
 
@@ -16,7 +18,7 @@ class DatabaseReminderRepository extends \Illuminate\Auth\Reminders\DatabaseRemi
 			$reminder = (array) $reminder;
 		}
 
-		// Convert the DateTime object that got saved to MongoDB
+		// Convert the DateTime object that got saved to SQLAnywhere
 		if (is_array($reminder['created_at']))
 		{
 			$reminder['created_at'] = $reminder['created_at']['date'] + $reminder['created_at']['timezone'];

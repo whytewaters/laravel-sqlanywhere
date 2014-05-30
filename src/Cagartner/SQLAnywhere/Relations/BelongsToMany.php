@@ -1,6 +1,8 @@
-<?php namespace Jenssegers\Mongodb\Relations;
+<?php 
 
-use Jenssegers\Mongodb\Model;
+namespace Cagartner\SQLAnywhere\Relations;
+
+use Cagartner\SQLAnywhere\Model;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany as EloquentBelongsToMany;
 

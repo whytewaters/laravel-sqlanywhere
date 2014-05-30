@@ -1,6 +1,7 @@
-<?php namespace Jenssegers\Mongodb\Eloquent;
+<?php 
+namespace Cagartner\SQLAnywhere\Eloquent;
 
-use MongoCursor;
+use SQLAnywhereCursor;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 
@@ -79,8 +80,8 @@ class Builder extends EloquentBuilder {
 
 		$connection = $this->model->getConnectionName();
 
-		// Convert MongoCursor results to a collection of models.
-		if ($results instanceof MongoCursor)
+		// Convert SQLAnywhereCursor results to a collection of models.
+		if ($results instanceof SQLAnywhereCursor)
 		{
 			$results = iterator_to_array($results, false);
 

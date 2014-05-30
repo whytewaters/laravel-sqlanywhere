@@ -1,10 +1,12 @@
-<?php namespace Jenssegers\Mongodb\Relations;
+<?php 
+
+namespace Cagartner\SQLAnywhere\Relations;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Eloquent\Collection;
-use MongoId;
+use SQLAnywhereId;
 
 class EmbedsMany extends EmbedsOneOrMany {
 
@@ -158,7 +160,7 @@ class EmbedsMany extends EmbedsOneOrMany {
         // Create a new key if needed.
         if ( ! $model->getAttribute('_id'))
         {
-            $model->setAttribute('_id', new MongoId);
+            $model->setAttribute('_id', new SQLAnywhereId);
         }
 
         // Push the new model to the database.
@@ -230,7 +232,7 @@ class EmbedsMany extends EmbedsOneOrMany {
         // Create a new key if needed.
         if ( ! $model->getAttribute('_id'))
         {
-            $model->setAttribute('_id', new MongoId);
+            $model->setAttribute('_id', new SQLAnywhereId);
         }
 
         $records = $this->getEmbedded();
