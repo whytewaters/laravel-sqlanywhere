@@ -1,5 +1,5 @@
 {
-    "name": "SQLAnywhere",
+    "name": "cagartner/laravel-sqlanywhere",
     "description": "A Sybase driver based Eloquent model and Query builder for Laravel 4",
     "keywords": ["laravel","eloquent","sybase","sqlanywhere","database","model"],
     "authors": [
