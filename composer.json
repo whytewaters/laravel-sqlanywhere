@@ -22,7 +22,7 @@
     },
     "autoload": {
         "psr-0": {
-            "Cagartner\\Mongodb": "src/",
+            "Cagartner\\SQLAnywhere": "src/",
             "Cagartner\\Eloquent": "src/"
         }
     }
