@@ -14,7 +14,7 @@ class SQLAnywhereConnector extends Connector implements ConnectorInterface {
 	 */
 	public function connect(array $config)
 	{
-		return $this->createConnection($config);
+		return $this->createConnection(array(), $config, array());
 	}
 
 
@@ -25,13 +25,13 @@ class SQLAnywhereConnector extends Connector implements ConnectorInterface {
 	 * @param  array   $options
 	 * @return SQLAnywhere
 	 */
-	public function createConnection(array $config)
+	public function createConnection($dsn, array $config, array $options)
 	{
 		$autocommit = array_get($config, 'autocommit');
 		$persintent = array_get($config, 'persintent');
 
 
-		return new SQLAnywhereClient($this->getDsn($config), $username, $password);
+		return new SQLAnywhereClient($this->getDsn($config), $autocommit, $persintent);
 	}
 	
 	/**
