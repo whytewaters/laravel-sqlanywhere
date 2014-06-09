@@ -60,6 +60,30 @@ class SQLAnywhereConnection extends Connection {
 	}
 
 	/**
+	 * Run an SQL statement and get the number of rows affected.
+	 *
+	 * @param  string  $query
+	 * @param  array   $bindings
+	 * @return int
+	 */
+	public function affectingStatement($query, $bindings = array())
+	{
+		return $this->run($query, $bindings, function($me, $query, $bindings)
+		{
+			if ($me->pretending()) return 0;
+
+			// For update or delete statements, we want to get the number of rows affected
+			// by the statement and return that back to the developer. We'll first need
+			// to execute the statement and then we'll use PDO to fetch the affected.
+			$statement = $me->getPdo()->prepare($query);
+
+			$statement->execute($me->prepareBindings($bindings));
+
+			return $statement->affectedRows();
+		});
+	}
+
+	/**
 	 * Get the default query grammar instance.
 	 *
 	 * @return Illuminate\Database\Query\Grammars\Grammars\Grammar
