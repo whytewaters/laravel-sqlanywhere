@@ -101,6 +101,6 @@ class SQLAnywhereQueryGrammar extends Grammar {
 	 */
 	protected function compileOffset(Builder $query, $offset)
 	{
-		return 'start at '.(int) $offset;
+		return 'start at '.((int) $offset+1);
 	}
 }

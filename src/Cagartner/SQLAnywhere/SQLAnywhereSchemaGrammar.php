@@ -21,13 +21,13 @@ class SQLAnywhereSchemaGrammar extends Grammar {
 	protected $modifiers = array('Unsigned', 'Nullable', 'Default', 'Increment');
 
 	/**
-	 * Compile the query to determine the list of tables.
+	 * Compile the query to determine if a table exists.
 	 *
 	 * @return string
 	 */
 	public function compileTableExists()
 	{
-		return 'select * from sys.systab where table_name = ?';
+		return 'select * from sys.systab where table_type_str = ?';
 	}
 
 	/**
@@ -112,7 +112,7 @@ class SQLAnywhereSchemaGrammar extends Grammar {
 
 		$table = $this->wrapTable($blueprint);
 
-		return "create index '{$command->index}' on {$table}";
+		return "alter table {$table} add {$type} {$command->index}($columns)";
 	}
 
 	/**
