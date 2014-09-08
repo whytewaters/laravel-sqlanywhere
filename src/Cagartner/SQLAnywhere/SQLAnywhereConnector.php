@@ -49,6 +49,10 @@ class SQLAnywhereConnector extends Connector implements ConnectorInterface {
 
         // The database name needs to be in the connection string, otherwise it will
         // authenticate to the admin database, which may result in permission errors.
-        return "uid={$username};pwd={$password};ENG={$database};commlinks={$host};charset={$charset}";
+        $dsn = "uid={$username};pwd={$password};ENG={$database};commlinks={$host}";
+        if (isset($charset)) {
+            $dsn.= ";charset={$charset}";
+        }
+        return $dsn;
     }
 }
