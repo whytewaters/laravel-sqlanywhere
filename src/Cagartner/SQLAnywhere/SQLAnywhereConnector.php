@@ -53,6 +53,11 @@ class SQLAnywhereConnector extends Connector implements ConnectorInterface {
         if (isset($charset)) {
             $dsn.= ";charset={$charset}";
         }
+
+		if(isset($server)) {
+			$dsn.= ";Server={$server}";
+		}
+
         return $dsn;
     }
 }
