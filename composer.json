@@ -12,7 +12,7 @@
         "php": ">=5.4.0"
     },
     "replace": {
-        "cagartner/sql-anywhere-client": "self.version",
+        "cagartner/sql-anywhere-client": "self.version"
     },
     "autoload": {
         "psr-0": {
