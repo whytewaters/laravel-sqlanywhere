@@ -15,9 +15,6 @@
         "illuminate/database": "5.1.*",
         "whytewaters/sql-anywhere-client": "dev-master"
     },
-    "replace": {
-        "cagartner/laravel-sqlanywhere": "self.version"
-    },
     "require-dev": {
         "orchestra/testbench": "2.1.*",
         "mockery/mockery": "*"
