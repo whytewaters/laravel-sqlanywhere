@@ -13,7 +13,7 @@
         "php": ">=5.4.0",
         "illuminate/support": "4.*",
         "illuminate/database": "4.*",
-        "cagartner/sql-anywhere-client": "dev-master"
+        "whytewaters/laravel-sqlanywhere": "dev-master"
     },
     "require-dev": {
         "orchestra/testbench": "2.1.*",
