@@ -12,7 +12,8 @@
     "require": {
         "php": ">=5.4.0",
         "illuminate/support": "4.*",
-        "illuminate/database": "4.*"
+        "illuminate/database": "4.*",
+        "whytewaters/sql-anywhere-client": "dev-master"
     },
     "replace": {
         "cagartner/laravel-sqlanywhere": "self.version"
