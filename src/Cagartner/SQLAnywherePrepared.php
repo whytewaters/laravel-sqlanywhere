@@ -67,12 +67,6 @@ class SQLAnywherePrepared
 				} else {
 					$parse = function($matchs) use ($connection, $array, $k) {
 						static $i = 0;
-
-						if(empty($array[$i])){
-							$i++;
-							return 'NULL';
-						}
-
 					  return "'" . sasql_escape_string($connection, $array[$i++]) . "'";
 					};
 					$__query = preg_replace_callback("(\?)is", $parse, $__query);
