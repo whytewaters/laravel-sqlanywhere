@@ -89,7 +89,7 @@ class SQLAnywherePrepared
 	}
 
 	public function __uquery(&$query) {
-		if(!$query = sasql_query( $this->__connection, $query )) {
+		if(!$query = @sasql_query( $this->__connection, $query )) {
 			$this->__setErrors('SQLER');
 			return false;
 		}
@@ -199,6 +199,8 @@ class SQLAnywherePrepared
 		$this->__errorCode = &$er;
 		$this->__errorInfo = array($this->__errorCode, $errno, $errst);
 		$this->__result = false;
+
+		throw new SQLAnywhereException($errst, $errno);
 	}
 
 }
