@@ -28,10 +28,10 @@ class SQLAnywhereConnector extends Connector implements ConnectorInterface {
 	public function createConnection($dsn, array $config, array $options)
 	{
 		$autocommit = array_get($config, 'autocommit');
-		$persintent = array_get($config, 'persintent');
+		$persistent = array_get($config, 'persintent');
 
 
-		return new SQLAnywhereClient($this->getDsn($config), $autocommit, $persintent);
+		return new SQLAnywhereClient($this->getDsn($config), $autocommit, $persistent);
 	}
 	
 	/**
@@ -45,17 +45,17 @@ class SQLAnywhereConnector extends Connector implements ConnectorInterface {
         // First we will create the basic DSN setup as well as the port if it is in
         // in the configuration options. This will give us the basic DSN we will
         // need to establish the SQLAnywhereClient and return them back for use.
-        extract($config);
 
         // The database name needs to be in the connection string, otherwise it will
         // authenticate to the admin database, which may result in permission errors.
-        $dsn = "uid={$username};pwd={$password};ENG={$database};commlinks={$host}";
-        if (isset($charset)) {
-            $dsn.= ";charset={$charset}";
+        $dsn = "uid={$config['username']};pwd={$config['password']};DBN={$config['database']};commlinks={$config['host']}";
+
+        if (isset($config['charset'])) {
+            $dsn.= ";charset={$config['charset']}";
         }
 
-		if(isset($server)) {
-			$dsn.= ";Server={$server}";
+		if(isset($config['server'])) {
+			$dsn.= ";ServerName={$config['server']}";
 		}
 
         return $dsn;
