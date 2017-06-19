@@ -56,9 +56,9 @@ class SQLAnywhereClient
 
 		// Verifica se a conexão é persistente
 		if ( $this->persistent ) {
-			$this->connection = sasql_pconnect( $this->dns );
+			$this->connection = @sasql_pconnect( $this->dns );
 		} else {
-			$this->connection = sasql_connect( $this->dns );
+			$this->connection = @sasql_connect( $this->dns );
 		}
 
 		if ( !$this->connection )
