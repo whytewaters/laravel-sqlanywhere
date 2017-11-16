@@ -103,4 +103,18 @@ class SQLAnywhereQueryGrammar extends Grammar {
 	{
 		return 'start at '.((int) $offset+1);
 	}
+
+
+    /**
+    +	 * Compile an exists statement into SQL.
+    +	 *
+    +	 * @param \Illuminate\Database\Query\Builder $query
+    +	 * @return string
+    +	 */
+	public function compileExists(Builder $query)
+	{
+		$select = $this->compileSelect($query);
+
+		return "select if exists($select) then 1 else 0 endif as {$this->wrap('exists')}";
+	}
 }
