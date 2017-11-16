@@ -70,36 +70,39 @@ class SQLAnywhereQuery
 	/**
 	 * Return one row of result
 	 * @param  constant $type Format of return
-	 * @return array|object       
+	 * @return array|object
+	 *
+	 * TODO: NOTE THAT THERE CONSTANTS SEEM TO BE MADEUP. SQLAnywhereClient::FETCH_ASSOC
+	 * TODO: LARAVEL USES PDO CONTANTS WHICH ARE NUMBERIC
+	 * TODO: LARAVEL 5 USES FETCH_CLASS AS THE DEFAULT, LARAVEL 4 USERS FETCH_ASSOC
 	 */
 	public function fetch($type=SQLAnywhereClient::FETCH_ASSOC)
 	{
 		$data = null;
 		if ($this->result) {
 			switch ($type) {
+				case \PDO::FETCH_ASSOC:
+					$data = sasql_fetch_assoc( $this->result );
+					break;
+
 				case 'array':
 					$data = sasql_fetch_array( $this->result );
-				break;
-
-				case 'assoc':
-					$data = sasql_fetch_assoc( $this->result );
-				break;
+					break;
 
 				case 'row':
 					$data = sasql_fetch_row( $this->result );
-				break;
+					break;
 
 				case 'field':
 					$data = sasql_fetch_field( $this->result );
-				break;
+					break;
 
 				case 'object':
 					$data = sasql_fetch_object( $this->result );
-				break;
-				
+					break;
+
 				default:
-					$data = sasql_fetch_array( $this->result );
-				break;
+					throw new \Exception("Invalid Fetch Type");
 			}		
 		}
 		return $data;
@@ -108,7 +111,11 @@ class SQLAnywhereQuery
 	/**
 	 * Return All values of Results in one choose format
 	 * @param  constant $type Format of return
-	 * @return array       
+	 * @return array
+	 *
+	 * TODO: NOTE THAT THERE CONSTANTS SEEM TO BE MADEUP. SQLAnywhereClient::FETCH_ASSOC
+	 * TODO: LARAVEL USES PDO CONTANTS WHICH ARE NUMBERIC
+	 * TODO: LARAVEL 5 USES FETCH_CLASS AS THE DEFAULT, LARAVEL 4 USERS FETCH_ASSOC
 	 */
 	public function fetchAll($type=SQLAnywhereClient::FETCH_ASSOC)
 	{
@@ -116,35 +123,34 @@ class SQLAnywhereQuery
 		
 		if ($this->result) {
 			switch ($type) {
+				case \PDO::FETCH_ASSOC:
+					while ($row = sasql_fetch_assoc( $this->result )) {
+						$data[] = $row;
+					}
+					break;
+
 				case 'array':
 					while ($row = sasql_fetch_array( $this->result ))
 						array_push($data, $row);
-				break;
-
-				case 'assoc':
-					while ($row = sasql_fetch_assoc( $this->result ))
-						array_push($data, $row);
-				break;
+					break;
 
 				case 'row':
 					while ($row = sasql_fetch_row( $this->result ))
 						array_push($data, $row);
-				break;
+					break;
 
 				case 'field':
 					while ($row = sasql_fetch_field( $this->result ))
 						array_push($data, $row);
-				break;
+					break;
 
 				case 'object':
 					while ($row = sasql_fetch_object( $this->result ))
 						array_push($data, $row);			
-				break;
+					break;
 				
 				default:
-					while ($row = sasql_fetch_array( $this->result ))
-						array_push($data, $row);
-				break;
+					throw new \Exception("Invalid Fetch Type");
 			}		
 		}
 
