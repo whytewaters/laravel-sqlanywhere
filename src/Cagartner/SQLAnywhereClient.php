@@ -1,8 +1,8 @@
 <?php namespace Cagartner;
 
-use Cagartner\SQLAnywherePrepared AS SQLAnywherePrepared, 
-Cagartner\SQLAnywhereQuery AS SQLAnywhereQuery,
-Exception;
+use Cagartner\SQLAnywherePrepared as SQLAnywherePrepared;
+use Cagartner\SQLAnywhereQuery as SQLAnywhereQuery;
+use Exception;
 
 /**
 * @author Carlos A Gartner <contato@carlosgartner.com.br>
@@ -14,7 +14,7 @@ class SQLAnywhereClient
 	public $connected     = false;	
 	public $status        = null;
 
-	protected $connection = false;
+	private $connection;
 	protected $server     = null;
 	protected $persistent = null ;
 	protected $autocommit = null ;
@@ -51,24 +51,9 @@ class SQLAnywhereClient
 		$this->persistent = $persistent;
 		$this->autocommit = $autocommit;
 
-		if (!function_exists('sasql_connect')) 
-			throw new Exception("SQL Anywhere model not install in this server!", 100);			
-
-		// Verifica se a conexão é persistente
-		if ( $this->persistent ) {
-			$this->connection = @sasql_pconnect( $this->dns );
-		} else {
-			$this->connection = @sasql_connect( $this->dns );
-		}
-
-		if ( !$this->connection )
-			throw new Exception("Connection Problem :: " . sasql_error( ), 101);
-
-		// Define option auto_commit
-		if ( $this->connection ) {
-			sasql_set_option($this->connection, 'auto_commit', ($this->autocommit ? 'on' : 0));
-			$this->dbinfo = Array($dns, $autocommit, $persistent);
-		}		
+		if (!function_exists('sasql_connect')) {
+            throw new Exception("SQL Anywhere model not install in this server!", 100);
+        }
 	}
 
 	/**
@@ -93,11 +78,11 @@ class SQLAnywhereClient
 	public function exec($sql_string)
 	{
 		$this->sql_string = $sql_string;
-		$query = sasql_query( $this->connection, $this->sql_string );
+		$query = sasql_query( $this->getConnection(), $this->sql_string );
 		if ( $query ) {
-			return new SQLAnywhereQuery( $query, $this->connection );
+			return new SQLAnywhereQuery( $query, $this->getConnection() );
 		} else {
-			throw new Exception("SQL String Problem :: " . sasql_error( $this->connection ), 110);		
+			throw new Exception("SQL String Problem :: " . sasql_error( $this->getConnection() ), 110);
 		}
 		return 0;
 	}
@@ -108,7 +93,7 @@ class SQLAnywhereClient
 	 */
 	public function inserted_id()
 	{
-		return sasql_insert_id( $this->connection );
+		return sasql_insert_id( $this->getConnection() );
 	}
 
 	/**
@@ -118,7 +103,7 @@ class SQLAnywhereClient
 	 */
 	public function lastInsertId()
 	{
-		return sasql_insert_id( $this->connection );
+		return sasql_insert_id( $this->getConnection() );
 	}
 	
 	/**
@@ -129,7 +114,7 @@ class SQLAnywhereClient
 	public function prepare($sql_string, $array=array())
 	{
 		$this->sql_string = $sql_string;
-		return new SQLAnywherePrepared( $this->sql_string, $this->connection, $this->dbinfo );
+		return new SQLAnywherePrepared( $this->sql_string, $this->getConnection(), $this->dbinfo );
 	}
 
 	/**
@@ -138,7 +123,7 @@ class SQLAnywhereClient
 	 */
 	public function errorCode()
 	{
-		return sasql_errorcode( $this->connection ? $this->connection : null );
+		return sasql_errorcode( $this->getConnection() ? $this->getConnection() : null );
 	}
 
 	/**
@@ -147,7 +132,7 @@ class SQLAnywhereClient
 	 */
 	public function errorInfo()
 	{
-		return sasql_error( $this->connection ? $this->connection : null );
+		return sasql_error( $this->getConnection() ? $this->getConnection() : null );
 	}
 
 	// UNSUPPORTED PUBLIC METHODS
@@ -161,7 +146,7 @@ class SQLAnywhereClient
 	 */
 	public function commit()
 	{
-		return sasql_commit( $this->connection );
+		return sasql_commit( $this->getConnection() );
 	}
 
 	/**
@@ -170,11 +155,11 @@ class SQLAnywhereClient
 	 */
 	public function rollback()
 	{
-		return sasql_rollback( $this->connection );
+		return sasql_rollback( $this->getConnection() );
 	}
 
 	public function __destruct(){
-	    return sasql_commit( $this->connection );
+	    return sasql_commit( $this->getConnection() );
   	}
 
   	// UNSUPPORTED PUBLIC METHODS
@@ -182,4 +167,27 @@ class SQLAnywhereClient
 	{
 		return true;
 	}
+
+
+    public function getConnection() {
+
+        // build connection if needed
+        if(!$this->connection) {
+            if($this->persistent) {
+                $this->connection = @sasql_pconnect($this->dns);
+            } else {
+                $this->connection = @sasql_connect($this->dns);
+            }
+
+            if(!$this->connection) {
+                throw new Exception("Connection Problem :: " . sasql_error(), 101);
+            }
+
+            // Define option auto_commit
+            sasql_set_option($this->connection, 'auto_commit', ($this->autocommit ? 'on' : 0));
+            $this->dbinfo = [$dns, $autocommit, $persistent];
+        }
+
+        return $this->connection;
+    }
 }
