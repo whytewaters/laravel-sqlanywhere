@@ -39,22 +39,21 @@ class SQLAnywhereClient
 	protected $query 	  = null;
 	protected $sql_string = null;
 	protected $num_rows   = 0;
-	
-	/**
-	 * Create connection fybase
-	 * @param string  $dns        String connection for sybase
-	 * @param boolean $persistent Define connection for persistent
-	 */
-	function __construct( $dns, $autocommit=true, $persistent=false )
-	{
-		$this->dns = $dns;
-		$this->persistent = $persistent;
-		$this->autocommit = $autocommit;
 
-		if (!function_exists('sasql_connect')) {
-            throw new Exception("SQL Anywhere model not install in this server!", 100);
+    /**
+     * Create connection sybase
+     * @param string $dns String connection for sybase
+     * @param boolean $persistent Define connection for persistent
+     */
+    public function __construct($dns, $autocommit = true, $persistent = false) {
+        $this->dns = $dns;
+        $this->persistent = $persistent;
+        $this->autocommit = $autocommit;
+
+        if(!function_exists('sasql_connect')) {
+            throw new Exception("SQL Anywhere driver is not installed on this server!", 100);
         }
-	}
+    }
 
 	/**
 	 * Retunr Array of itens
@@ -168,26 +167,31 @@ class SQLAnywhereClient
 		return true;
 	}
 
-
     public function getConnection() {
 
-        // build connection if needed
         if(!$this->connection) {
-            if($this->persistent) {
-                $this->connection = @sasql_pconnect($this->dns);
-            } else {
-                $this->connection = @sasql_connect($this->dns);
-            }
-
-            if(!$this->connection) {
-                throw new Exception("Connection Problem :: " . sasql_error(), 101);
-            }
-
-            // Define option auto_commit
-            sasql_set_option($this->connection, 'auto_commit', ($this->autocommit ? 'on' : 0));
-            $this->dbinfo = [$dns, $autocommit, $persistent];
+            $this->connect();
         }
 
         return $this->connection;
     }
+
+    private function connect() {
+        if($this->persistent) {
+            $connection = @sasql_pconnect($this->dns);
+        } else {
+            $connection = @sasql_connect($this->dns);
+        }
+
+        if(!$connection) {
+            throw new Exception("Connection Problem :: " . sasql_error(), 101);
+        }
+
+        // Define option auto_commit
+        sasql_set_option($connection, 'auto_commit', ($this->autocommit ? 'on' : 0));
+        $this->dbinfo = [$dns, $autocommit, $persistent];
+
+        return $connection;
+    }
+
 }
