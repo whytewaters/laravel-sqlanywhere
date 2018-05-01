@@ -13,21 +13,14 @@
         "php": ">=5.4.0",
         "illuminate/support": "4.*",
         "illuminate/database": "4.*",
-        "whytewaters/sql-anywhere-client": "1.0.2"
     },
-    "repositories": [
-        {
-            "type": "git",
-            "url": "https://github.com/whytewaters/sql-anywhere-client"
-        }
-    ],
     "require-dev": {
         "orchestra/testbench": "2.1.*",
         "mockery/mockery": "*"
     },
     "autoload": {
-        "psr-0": {
-            "Cagartner\\SQLAnywhere": "src/"
+        "psr-4": {
+            "Cagartner\\": "src/Cagartner/"
         }
     }
 }
