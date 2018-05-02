@@ -156,20 +156,18 @@ class SQLAnywhereClient {
 
     private function connect() {
         if($this->persistent) {
-            $connection = @sasql_pconnect($this->dns);
+            $this->connection = @sasql_pconnect($this->dns);
         } else {
-            $connection = @sasql_connect($this->dns);
+            $this->connection = @sasql_connect($this->dns);
         }
 
-        if(!$connection) {
+        if(!$this->connection) {
             throw new Exception("Connection Problem :: " . sasql_error(), 101);
         }
 
         // Define option auto_commit
-        sasql_set_option($connection, 'auto_commit', ($this->autocommit ? 'on' : 0));
-        $this->dbinfo = [$dns, $autocommit, $persistent];
-
-        return $connection;
+        sasql_set_option($this->connection, 'auto_commit', ($this->autocommit ? 'on' : 0));
+        $this->dbinfo = [$this->dns, $this->autocommit, $this->persistent];
     }
 
     // UNSUPPORTED PUBLIC METHODS
@@ -182,6 +180,7 @@ class SQLAnywhereClient {
     public function quote($data = '') {
         // TODO add support?
         throw new \Exception('SQLAnywhereClient::quote not implemented');
+
         // return sasql_escape_string($data);
         return true;
     }
