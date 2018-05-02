@@ -31,14 +31,15 @@ class SQLAnywhereClient {
     // ----------------------------------------------------
     // Query and Statent
     // ----------------------------------------------------
-    protected $query = null;
-    protected $sql_string = null;
+    protected $query;
+    protected $sql_string;
     protected $num_rows = 0;
 
     /**
      * Create connection sybase
      * @param string $dns String connection for sybase
      * @param boolean $persistent Define connection for persistent
+     * @throws Exception
      */
     public function __construct($dns, $autocommit = true, $persistent = false) {
         $this->dns = $dns;
@@ -46,7 +47,7 @@ class SQLAnywhereClient {
         $this->autocommit = $autocommit;
 
         if(!function_exists('sasql_connect')) {
-            throw new Exception("SQL Anywhere driver is not installed on this server!", 100);
+            throw new Exception('SQL Anywhere driver is not installed on this server!', 100);
         }
     }
 
@@ -54,6 +55,7 @@ class SQLAnywhereClient {
      * Retunr Array of items
      * @param  string $sql_string SQL command
      * @return array|boolean
+     * @throws Exception
      */
     public function query($sql_string, $return = self::FETCH_ASSOC) {
         $query = self::exec($sql_string);
@@ -68,17 +70,16 @@ class SQLAnywhereClient {
      * Exec a query os sql comand
      * @param  string $sql_string SQÇ Command
      * @return SQLAnywhereQuery|boolean
+     * @throws Exception
      */
     public function exec($sql_string) {
         $this->sql_string = $sql_string;
         $query = sasql_query($this->getConnection(), $this->sql_string);
         if($query) {
             return new SQLAnywhereQuery($query, $this->getConnection());
-        } else {
-            throw new Exception("SQL String Problem :: " . sasql_error($this->getConnection()), 110);
         }
 
-        return 0;
+        throw new Exception('SQL String Problem :: ' . sasql_error($this->getConnection()), 110);
     }
 
     /**
@@ -101,7 +102,7 @@ class SQLAnywhereClient {
     /**
      * Create a prepared statement an store it in self::stmnt
      * @param  string $sql_string SQL string
-     * @return \SQLAnywherePrepared
+     * @return SQLAnywherePrepared
      */
     public function prepare($sql_string, $array = []) {
         $this->sql_string = $sql_string;
@@ -119,7 +120,7 @@ class SQLAnywhereClient {
 
     /**
      * Returns all error info for connection
-     * @return [type] [description]
+     * @return string
      */
     public function errorInfo() {
         return sasql_error($this->getConnection());
@@ -142,7 +143,7 @@ class SQLAnywhereClient {
     }
 
     public function __destruct() {
-        return sasql_commit($this->getConnection());
+        sasql_commit($this->getConnection());
     }
 
     public function getConnection() {
@@ -170,19 +171,13 @@ class SQLAnywhereClient {
         $this->dbinfo = [$this->dns, $this->autocommit, $this->persistent];
     }
 
-    // UNSUPPORTED PUBLIC METHODS
+    // TODO add support
     public function beginTransaction() {
-        // TODO add support
         return true;
     }
 
-    // UNSUPPORTED PUBLIC METHODS
     public function quote($data = '') {
-        // TODO add support?
-        throw new \Exception('SQLAnywhereClient::quote not implemented');
-
-        // return sasql_escape_string($data);
-        return true;
+        return sasql_escape_string($this->connection, $data);
     }
 
 }
