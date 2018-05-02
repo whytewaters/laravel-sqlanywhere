@@ -5,40 +5,35 @@ use Cagartner\SQLAnywhereQuery as SQLAnywhereQuery;
 use Exception;
 
 /**
-* @author Carlos A Gartner <contato@carlosgartner.com.br>
-*/
-class SQLAnywhereClient
-{
-	const VERSION      = '1.0';
+ * @author Carlos A Gartner <contato@carlosgartner.com.br>
+ */
+class SQLAnywhereClient {
+    const VERSION = '1.0';
 
-	public $connected     = false;	
-	public $status        = null;
+    private $connection;
+    protected $persistent = false;
+    protected $autocommit = false;
+    protected $dns;
+    protected $dbinfo = [];
 
-	private $connection;
-	protected $server     = null;
-	protected $persistent = null ;
-	protected $autocommit = null ;
-	protected $dns        = null ;
-	protected $dbinfo     = array();
+    // Types os returns
+    const FETCH_ARRAY = 'array';
+    const FETCH_OBJECT = 'object';
+    const FETCH_ROW = 'row';
+    const FETCH_FIELD = 'field';
+    const FETCH_ASSOC = 'assoc';
 
-	// Types os returns
-	const FETCH_ARRAY  = 'array';
-	const FETCH_OBJECT = 'object';
-	const FETCH_ROW    = 'row';
-	const FETCH_FIELD  = 'field';
-	const FETCH_ASSOC  = 'assoc';
+    // Bind Param
+    const INPUT = 1;
+    const OUTPUT = 2;
+    const INPUT_OUTPUT = 3;
 
-	// Bind Param
-	const INPUT        = 1;
-	const OUTPUT       = 2;
-	const INPUT_OUTPUT = 3;
-
-	// ----------------------------------------------------
-	// Query and Statent
-	// ----------------------------------------------------
-	protected $query 	  = null;
-	protected $sql_string = null;
-	protected $num_rows   = 0;
+    // ----------------------------------------------------
+    // Query and Statent
+    // ----------------------------------------------------
+    protected $query = null;
+    protected $sql_string = null;
+    protected $num_rows = 0;
 
     /**
      * Create connection sybase
@@ -55,117 +50,100 @@ class SQLAnywhereClient
         }
     }
 
-	/**
-	 * Retunr Array of itens
-	 * @param  string $sql_string SQL command
-	 * @return array|boolean           
-	 */
-	public function query($sql_string, $return=self::FETCH_ASSOC)
-	{
-		$query = self::exec( $sql_string );
-		if ( $query ) {
-			return $query->fetch($return);
-		} 
-		return 0;		
-	}
+    /**
+     * Retunr Array of items
+     * @param  string $sql_string SQL command
+     * @return array|boolean
+     */
+    public function query($sql_string, $return = self::FETCH_ASSOC) {
+        $query = self::exec($sql_string);
+        if($query) {
+            return $query->fetch($return);
+        }
 
-	/**
-	 * Exec a query os sql comand
-	 * @param  string $sql_string SQÇ Command
-	 * @return SQLAnywhereQuery|boolean            
-	 */
-	public function exec($sql_string)
-	{
-		$this->sql_string = $sql_string;
-		$query = sasql_query( $this->getConnection(), $this->sql_string );
-		if ( $query ) {
-			return new SQLAnywhereQuery( $query, $this->getConnection() );
-		} else {
-			throw new Exception("SQL String Problem :: " . sasql_error( $this->getConnection() ), 110);
-		}
-		return 0;
-	}
+        return 0;
+    }
 
-	/**
-	 * Returns the last value inserted into an IDENTITY column or a DEFAULT AUTOINCREMENT column, or zero if the most recent insert was into a table that did not contain an IDENTITY or DEFAULT AUTOINCREMENT column. 
-	 * @return integer Last insert ID.
-	 */
-	public function inserted_id()
-	{
-		return sasql_insert_id( $this->getConnection() );
-	}
+    /**
+     * Exec a query os sql comand
+     * @param  string $sql_string SQÇ Command
+     * @return SQLAnywhereQuery|boolean
+     */
+    public function exec($sql_string) {
+        $this->sql_string = $sql_string;
+        $query = sasql_query($this->getConnection(), $this->sql_string);
+        if($query) {
+            return new SQLAnywhereQuery($query, $this->getConnection());
+        } else {
+            throw new Exception("SQL String Problem :: " . sasql_error($this->getConnection()), 110);
+        }
 
-	/**
-	 * PDO Compability 
-	 * Returns the last value inserted into an IDENTITY column or a DEFAULT AUTOINCREMENT column, or zero if the most recent insert was into a table that did not contain an IDENTITY or DEFAULT AUTOINCREMENT column. 
-	 * @return integer Last insert ID.
-	 */
-	public function lastInsertId()
-	{
-		return sasql_insert_id( $this->getConnection() );
-	}
-	
-	/**
-	 * Create a prepared statement an store it in self::stmnt
-	 * @param  string $sql_string SQL string
-	 * @return \SQLAnywherePrepared         
-	 */
-	public function prepare($sql_string, $array=array())
-	{
-		$this->sql_string = $sql_string;
-		return new SQLAnywherePrepared( $this->sql_string, $this->getConnection(), $this->dbinfo );
-	}
+        return 0;
+    }
 
-	/**
-	 * Return error code for connection
-	 * @return int 
-	 */
-	public function errorCode()
-	{
-		return sasql_errorcode( $this->getConnection() ? $this->getConnection() : null );
-	}
+    /**
+     * Returns the last value inserted into an IDENTITY column or a DEFAULT AUTOINCREMENT column, or zero if the most recent insert was into a table that did not contain an IDENTITY or DEFAULT AUTOINCREMENT column.
+     * @return integer Last insert ID.
+     */
+    public function inserted_id() {
+        return sasql_insert_id($this->getConnection());
+    }
 
-	/**
-	 * Returns all error info for connection
-	 * @return [type] [description]
-	 */
-	public function errorInfo()
-	{
-		return sasql_error( $this->getConnection() ? $this->getConnection() : null );
-	}
+    /**
+     * Alias for PDO Compability
+     * Returns the last value inserted into an IDENTITY column or a DEFAULT AUTOINCREMENT column, or zero if the most recent insert was into a table that did not contain an IDENTITY or DEFAULT AUTOINCREMENT column.
+     * @return integer Last insert ID.
+     */
+    public function lastInsertId() {
+        return $this->inserted_id();
+    }
 
-	// UNSUPPORTED PUBLIC METHODS
-	public function beginTransaction() {
-		return true;
-	}
+    /**
+     * Create a prepared statement an store it in self::stmnt
+     * @param  string $sql_string SQL string
+     * @return \SQLAnywherePrepared
+     */
+    public function prepare($sql_string, $array = []) {
+        $this->sql_string = $sql_string;
 
-	/**
-	 * Commit the transaction
-	 * @return boolean TRUE if is successful or FALSE otherwise.
-	 */
-	public function commit()
-	{
-		return sasql_commit( $this->getConnection() );
-	}
+        return new SQLAnywherePrepared($this->sql_string, $this->getConnection(), $this->dbinfo);
+    }
 
-	/**
-	 * Rollback last commit action
-	 * @return boolean TRUE if is successful or FALSE otherwise.
-	 */
-	public function rollback()
-	{
-		return sasql_rollback( $this->getConnection() );
-	}
+    /**
+     * Return error code for connection
+     * @return int
+     */
+    public function errorCode() {
+        return sasql_errorcode($this->getConnection());
+    }
 
-	public function __destruct(){
-	    return sasql_commit( $this->getConnection() );
-  	}
+    /**
+     * Returns all error info for connection
+     * @return [type] [description]
+     */
+    public function errorInfo() {
+        return sasql_error($this->getConnection());
+    }
 
-  	// UNSUPPORTED PUBLIC METHODS
-  	public function quote($data='')
-	{
-		return true;
-	}
+    /**
+     * Commit the transaction
+     * @return boolean TRUE if is successful or FALSE otherwise.
+     */
+    public function commit() {
+        return sasql_commit($this->getConnection());
+    }
+
+    /**
+     * Rollback last commit action
+     * @return boolean TRUE if is successful or FALSE otherwise.
+     */
+    public function rollback() {
+        return sasql_rollback($this->getConnection());
+    }
+
+    public function __destruct() {
+        return sasql_commit($this->getConnection());
+    }
 
     public function getConnection() {
 
@@ -192,6 +170,20 @@ class SQLAnywhereClient
         $this->dbinfo = [$dns, $autocommit, $persistent];
 
         return $connection;
+    }
+
+    // UNSUPPORTED PUBLIC METHODS
+    public function beginTransaction() {
+        // TODO add support
+        return true;
+    }
+
+    // UNSUPPORTED PUBLIC METHODS
+    public function quote($data = '') {
+        // TODO add support?
+        throw new \Exception('SQLAnywhereClient::quote not implemented');
+        // return sasql_escape_string($data);
+        return true;
     }
 
 }
