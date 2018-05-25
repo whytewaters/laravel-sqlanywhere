@@ -85,6 +85,7 @@ class SQLAnywhereQuery
 					$data = sasql_fetch_assoc( $this->result );
 					break;
 
+                case \PDO::FETCH_CLASS:
                 case \PDO::FETCH_OBJ:
                     $data = sasql_fetch_object( $this->result );
                     break;
@@ -133,6 +134,7 @@ class SQLAnywhereQuery
 					}
 					break;
 
+                case \PDO::FETCH_CLASS:
                 case \PDO::FETCH_OBJ:
                     while ($row = sasql_fetch_object( $this->result )) {
                         $data[] = $row;
