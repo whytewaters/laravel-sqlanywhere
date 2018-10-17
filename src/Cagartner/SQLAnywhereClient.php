@@ -143,7 +143,8 @@ class SQLAnywhereClient {
     }
 
     public function __destruct() {
-        sasql_commit($this->getConnection());
+        // don't commit on desctruct, this is same behaviour as existing rtbs db connection
+//        sasql_commit($this->getConnection());
     }
 
     public function getConnection() {
