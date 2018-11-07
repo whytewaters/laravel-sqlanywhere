@@ -97,12 +97,16 @@ class SQLAnywhereQuery
 					$data = sasql_fetch_field( $this->result );
 					break;
 
-				case 'object':
+                case \PDO::FETCH_OBJ:
 					$data = sasql_fetch_object( $this->result );
 					break;
 
+                case \PDO::FETCH_CLASS:
+                    throw new \Exception("FETCH_CLASS Not Supported for SQL Anywhere");
+                    break;
+
 				default:
-					throw new \Exception("Invalid Fetch Type");
+					throw new \Exception("Invalid Fetch Type {$type}");
 			}		
 		}
 		return $data;
@@ -130,27 +134,32 @@ class SQLAnywhereQuery
 					break;
 
 				case 'array':
-					while ($row = sasql_fetch_array( $this->result ))
-						array_push($data, $row);
-					break;
+					while ($row = sasql_fetch_array( $this->result )) {
+                        $data[] = $row;
+                    }
 
 				case 'row':
-					while ($row = sasql_fetch_row( $this->result ))
-						array_push($data, $row);
-					break;
+					while ($row = sasql_fetch_row( $this->result )) {
+                        $data[] = $row;
+                    }
 
 				case 'field':
-					while ($row = sasql_fetch_field( $this->result ))
-						array_push($data, $row);
+					while ($row = sasql_fetch_field( $this->result )) {
+                        $data[] = $row;
+                    }
+
+				case \PDO::FETCH_OBJ:
+					while ($row = sasql_fetch_object( $this->result )) {
+                        $data[] = $row;
+                    }
 					break;
 
-				case 'object':
-					while ($row = sasql_fetch_object( $this->result ))
-						array_push($data, $row);			
-					break;
+                case \PDO::FETCH_CLASS:
+                    throw new \Exception("FETCH_CLASS Not Supported for SQL Anywhere");
+                    break;
 				
 				default:
-					throw new \Exception("Invalid Fetch Type");
+					throw new \Exception("Invalid Fetch Type {$type}");
 			}		
 		}
 
