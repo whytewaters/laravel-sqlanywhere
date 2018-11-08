@@ -33,6 +33,17 @@ class SQLAnywherePrepared
 			array_push($this->__boundParams, $variable);
 	}
 
+    /*
+     * Same as bindParam but not by reference
+     */
+    public function bindValue($mixed, $variable, $type = null, $lenght = null) {
+        if (is_string($mixed)) {
+            $this->__boundParams[$mixed] = $variable;
+        } else {
+            $this->__boundParams[] = $variable;
+        }
+    }
+
 	/**
 	 * Public method:
 	 *	Checks if query was valid and returns how may fields returns
