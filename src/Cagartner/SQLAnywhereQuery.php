@@ -81,7 +81,7 @@ class SQLAnywhereQuery
 		$data = null;
 		if ($this->result) {
 			switch ($type) {
-				case \PDO::FETCH_ASSOC:
+				case 'assoc':
 					$data = sasql_fetch_assoc( $this->result );
 					break;
 
@@ -123,7 +123,7 @@ class SQLAnywhereQuery
 		
 		if ($this->result) {
 			switch ($type) {
-				case \PDO::FETCH_ASSOC:
+				case 'assoc':
 					while ($row = sasql_fetch_assoc( $this->result )) {
 						$data[] = $row;
 					}
