@@ -46,7 +46,7 @@ class SQLAnywhereClient {
         $this->persistent = $persistent;
         $this->autocommit = $autocommit;
 
-        if(!function_exists('sasql_connect')) {
+        if (!function_exists('sasql_connect')) {
             throw new Exception('SQL Anywhere driver is not installed on this server!', 100);
         }
     }
@@ -58,8 +58,8 @@ class SQLAnywhereClient {
      * @throws Exception
      */
     public function query($sql_string, $return = self::FETCH_ASSOC) {
-        $query = self::exec($sql_string);
-        if($query) {
+        $query = $this->exec($sql_string);
+        if ($query) {
             return $query->fetch($return);
         }
 
@@ -75,7 +75,7 @@ class SQLAnywhereClient {
     public function exec($sql_string) {
         $this->sql_string = $sql_string;
         $query = sasql_query($this->getConnection(), $this->sql_string);
-        if($query) {
+        if ($query) {
             return new SQLAnywhereQuery($query, $this->getConnection());
         }
 
@@ -148,7 +148,7 @@ class SQLAnywhereClient {
 
     public function getConnection() {
 
-        if(!$this->connection) {
+        if (!$this->connection) {
             $this->connect();
         }
 
@@ -156,14 +156,14 @@ class SQLAnywhereClient {
     }
 
     private function connect() {
-        if($this->persistent) {
+        if ($this->persistent) {
             $this->connection = @sasql_pconnect($this->dns);
         } else {
             $this->connection = @sasql_connect($this->dns);
         }
 
-        if(!$this->connection) {
-            throw new Exception("Connection Problem :: " . sasql_error(), 101);
+        if (!$this->connection) {
+            throw new Exception('Connection Problem :: ' . sasql_error(), 101);
         }
 
         // Define option auto_commit
