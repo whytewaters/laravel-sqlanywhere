@@ -1,7 +1,7 @@
 <?php namespace Cagartner\SQLAnywhere;
 
+use Cagartner\SQLAnywhereClient;
 use Illuminate\Database\Connection;
-use \Cagartner\SQLAnywhereClient;
 
 class SQLAnywhereConnection extends Connection {
 
@@ -44,22 +44,24 @@ class SQLAnywhereConnection extends Connection {
 	 */
 	public function select($query, $bindings = array())
 	{
-		return $this->run($query, $bindings, function($me, $query, $bindings)
-		{
-			if ($me->pretending()) return array();
+        // new version since Laravel 5.4
+        // /vendor/laravel/framework/src/Illuminate/Database/Connection.php
+        //  --> function: select(...)
+        return $this->run($query, $bindings, function($query, $bindings) {
+            if ($this->pretending()) return [];
 
-			// For select statements, we'll simply execute the query and return an array
-			// of the database result set. Each element in the array will be a single
-			// row from the database table, and will either be an array or objects.
-			$statement = $me->getReadPdo()->prepare($query);
+            // For select statements, we'll simply execute the query and return an array
+            // of the database result set. Each element in the array will be a single
+            // row from the database table, and will either be an array or objects.
+            $statement = $this->getReadPdo()->prepare($query);
 
-			$statement->execute($me->prepareBindings($bindings));
+            $statement->execute($this->prepareBindings($bindings));
 
-			return $statement->fetchAll($me->getFetchMode());
-		});
-	}
+            return $statement->fetchAll();
+        });
+    }
 
-	/**
+    /**
 	 * Run an SQL statement and get the number of rows affected.
 	 *
 	 * @param  string  $query
