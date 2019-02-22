@@ -42,20 +42,20 @@ class SQLAnywhereConnection extends Connection {
 	 * @param  array   $bindings
 	 * @return array
 	 */
-	public function select($query, $bindings = array())
+	public function select($query, $bindings = array(), $useReadPdo = true)
 	{
-		return $this->run($query, $bindings, function($me, $query, $bindings)
+		return $this->run($query, $bindings, function($query, $ihavenoidea) use ($bindings)
 		{
-			if ($me->pretending()) return array();
+//			if ($me->pretending()) return array();
 
 			// For select statements, we'll simply execute the query and return an array
 			// of the database result set. Each element in the array will be a single
 			// row from the database table, and will either be an array or objects.
-			$statement = $me->getReadPdo()->prepare($query);
+			$statement = $this->getReadPdo()->prepare($query);
 
-			$statement->execute($me->prepareBindings($bindings));
+			$statement->execute($this->prepareBindings($bindings));
 
-			return $statement->fetchAll($me->getFetchMode());
+			return $statement->fetchAll(\PDO::FETCH_ASSOC);
 		});
 	}
 
