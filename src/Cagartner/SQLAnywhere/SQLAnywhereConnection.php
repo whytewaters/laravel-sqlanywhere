@@ -41,7 +41,7 @@ class SQLAnywhereConnection extends Connection {
      * @param  array $bindings
      * @return array
      */
-    public function select($query, $bindings = []) {
+    public function select($query, $bindings = [], $useReadPdo = true) {
         // new version since Laravel 5.4
         // /vendor/laravel/framework/src/Illuminate/Database/Connection.php
         //  --> function: select(...)
